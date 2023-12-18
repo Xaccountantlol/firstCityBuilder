@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class MenuManager : MonoBehaviour
 {
@@ -24,12 +25,12 @@ public class MenuManager : MonoBehaviour
             return;
         }
 
-        _tileObject.GetComponentInChildren<Text>().text = tile.TileName;
+        _tileObject.GetComponentInChildren<TextMeshProUGUI>().text = tile.TileName;
         _tileObject.SetActive(true);
 
         if (tile.OccupiedUnit)
         {
-            _tileUnitObject.GetComponentInChildren<Text>().text = tile.OccupiedUnit.UnitName;
+            _tileUnitObject.GetComponentInChildren<TextMeshProUGUI>().text = tile.OccupiedUnit.UnitName;
             _tileUnitObject.SetActive(true);
         }
     }
@@ -42,7 +43,7 @@ public class MenuManager : MonoBehaviour
             return;
         }
 
-        _selectedHeroObject.GetComponentInChildren<Text>().text = hero.UnitName;
+        _selectedHeroObject.GetComponentInChildren<TextMeshProUGUI>().text = hero.UnitName;
         _selectedHeroObject.SetActive(true);
     }
 }

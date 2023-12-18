@@ -3,7 +3,10 @@ guid: 0db9299c1b1e62b4584dc534f52875be
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - _grassTile: {fileID: 2366869564218387501, guid: 8d89399fd1c3fc44b8bd92ddc05be990, type: 3}
+  - _mountainTile: {fileID: 6212225217193439177, guid: b4ea8c1fb3f47d040a9b33e1f7786ed1, type: 3}
+  - _cam: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

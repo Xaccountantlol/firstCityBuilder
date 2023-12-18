@@ -36,6 +36,8 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.EnemiesTurn:
                 break;
+            case GameState.BuildingPlacement:
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
         }
@@ -48,5 +50,6 @@ public enum GameState
     SpawnHeroes = 1,
     SpawnEnemies = 2,
     HeroesTurn = 3,
-    EnemiesTurn = 4
+    EnemiesTurn = 4,
+    BuildingPlacement = 5
 }
