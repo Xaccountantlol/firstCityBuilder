@@ -12,6 +12,9 @@ public abstract class Tile : MonoBehaviour
     public BaseUnit OccupiedUnit;
     public bool Walkable => _isWalkable && OccupiedUnit == null;
 
+    
+
+
     public virtual void Init(int x, int y)
     {
         // Initialization code (if any)
@@ -48,17 +51,57 @@ public abstract class Tile : MonoBehaviour
             if (selectedHero != null)
             {
                 BaseEnemy enemy = null;
+                Tile treeTile = null;
+
+                // Check if the OccupiedUnit is an enemy
                 if (OccupiedUnit != null && OccupiedUnit.Faction == Faction.Enemy)
                 {
                     enemy = (BaseEnemy)OccupiedUnit;
                 }
+                // Check if the current tile is a tree tile
+                else if (this.CompareTag("TreeTile"))
+                {
+                    treeTile = this;
+                }
 
+                // If the tile is walkable or there is an enemy, move the hero to this tile
                 if (Walkable || enemy != null)
                 {
                     SetUnit(selectedHero, enemy);
                 }
+                // If the tile is a tree tile, move the hero and destroy the tree
+                else if (treeTile != null)
+                {
+                    MoveHeroToTreeTile(selectedHero, treeTile);
+                }
             }
         }
+    }
+
+    // Method to handle hero movement to a tree tile and destroy it
+    private void MoveHeroToTreeTile(BaseHero hero, Tile treeTile)
+    {
+        // Move the hero to the tree tile position
+        hero.transform.position = treeTile.transform.position;
+
+        // Increase the wood count
+        ResourceManager.Instance.AddWood(1);
+
+        // Get the position of the tree tile
+        Vector2 treeTilePosition = new Vector2(treeTile.transform.position.x, treeTile.transform.position.y);
+
+        // Destroy the tree tile gameObject
+        Destroy(treeTile.gameObject);
+
+        // Instantiate a new grass tile at the tree tile's position
+        Tile grassTilePrefab = GridManager.Instance.GetGrassTilePrefab();
+        Tile newGrassTile = Instantiate(grassTilePrefab, treeTilePosition, Quaternion.identity).GetComponent<Tile>();
+
+        // Initialize the new grass tile if necessary
+        newGrassTile.Init((int)treeTilePosition.x, (int)treeTilePosition.y);
+
+        // Replace the tree tile in the GridManager's tiles dictionary
+        GridManager.Instance.ReplaceTileAtPosition(treeTilePosition, newGrassTile);
     }
 
     public void SetUnit(BaseUnit unit, BaseEnemy enemy = null)

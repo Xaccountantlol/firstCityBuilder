@@ -11,11 +11,24 @@ public class GridManager : MonoBehaviour
     public static GridManager Instance;
     [SerializeField] private int _width, _height;
 
-    [SerializeField] private Tile _grassTile, _mountainTile;
+    [SerializeField] private Tile _grassTile, _mountainTile, _treeTile;
 
     [SerializeField] private Transform _cam;
 
     private Dictionary<Vector2, Tile> _tiles;
+
+    public void ReplaceTileAtPosition(Vector2 position, Tile newTile)
+    {
+        if (_tiles.ContainsKey(position))
+        {
+            _tiles[position] = newTile;
+        }
+    }
+
+    public Tile GetGrassTilePrefab()
+    {
+        return _grassTile;
+    }
 
     void Awake()
     {
@@ -29,14 +42,25 @@ public class GridManager : MonoBehaviour
         {
             for (int y = 0; y < _height; y++)
             {
-                var randomTile = Random.Range(0, 6) == 3 ? _mountainTile : _grassTile;
+                Tile randomTile;
+                int randomType = Random.Range(0, 10); // Range from 0 to 9
+
+                if (randomType == 0) // 1 out of 10 for 10%
+                {
+                    randomTile = _mountainTile;
+                }
+                else if (randomType >= 1 && randomType <= 4) // 4 out of 10 for 40%
+                {
+                    randomTile = _treeTile; // This is your new forest tile
+                }
+                else // The remaining 50% chance
+                {
+                    randomTile = _grassTile;
+                }
+
                 var spawnedTile = Instantiate(randomTile, new Vector3(x, y), Quaternion.identity);
                 spawnedTile.name = $"Tile {x} {y}";
-
-
                 spawnedTile.Init(x, y);
-
-
                 _tiles[new Vector2(x, y)] = spawnedTile;
             }
         }
@@ -61,7 +85,7 @@ public class GridManager : MonoBehaviour
         if (_tiles.TryGetValue(pos, out var tile)) return tile;
         return null;
     }
-    private void OnGUI()
+  /*  private void OnGUI()
     {
         foreach (KeyValuePair<Vector2, Tile> entry in _tiles)
         {
@@ -74,5 +98,5 @@ public class GridManager : MonoBehaviour
             // Draw the label on the screen
             GUI.Label(new Rect(point.x - 25, point.y - 10, 50, 20), $"{entry.Key.x},{entry.Key.y}");
         }
-    }
+    }*/
 }

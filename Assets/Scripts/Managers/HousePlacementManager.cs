@@ -17,6 +17,26 @@ public class HousePlacementManager : MonoBehaviour
 
     void Update()
     {
+
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ToggleHouseSelection();
+        }
+
+        // Handle the house placement logic
+        if (isHouseSelected && houseRenderer != null)
+        {
+            HandleHousePlacement();
+        }
+
+        // Check for right-click or Escape key to cancel house selection
+        if (isHouseSelected && (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape)))
+        {
+            CancelHouseSelection();
+        }
+    }
+
+ private void ToggleHouseSelection() {
         if (Input.GetKeyDown(KeyCode.B))
         {
             if (GameManager.Instance.GameState != GameState.BuildingPlacement)
@@ -32,22 +52,29 @@ public class HousePlacementManager : MonoBehaviour
                 isHouseSelected = false;
             }
         }
-
-        if (isHouseSelected && houseRenderer != null)
-        {
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector2Int gridPosition = SnapPositionToGrid(mousePosition);
-            Vector3 worldPosition = GetCellCenter(gridPosition);
-            // Note: depending on your prefab setup, this worldPosition may still not give you the visual offset you'd like
-            // maybe you don't want to use GetCellCenter and would rather just stick with the snapped corner of a tile, gridPosition
+    }
 
 
-            bool canBePlaced = IsPlacementValid(gridPosition, width, height);
+     
 
-            currentHouseInstance.transform.position = worldPosition;
-            currentHouseInstance.SetActive(true);
+private void HandleHousePlacement()
+{
+    if (isHouseSelected && houseRenderer != null)
+    {
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2Int gridPosition = SnapPositionToGrid(mousePosition);
+        Vector3 worldPosition = GetCellCenter(gridPosition);
+        // Note: depending on your prefab setup, this worldPosition may still not give you the visual offset you'd like
+        // maybe you don't want to use GetCellCenter and would rather just stick with the snapped corner of a tile, gridPosition
 
-            houseRenderer.color = canBePlaced ? originalColor : invalidColor;
+
+        bool canBePlaced = IsPlacementValid(gridPosition, width, height);
+
+        currentHouseInstance.transform.position = worldPosition;
+        currentHouseInstance.SetActive(true);
+
+        houseRenderer.color = canBePlaced ? originalColor : invalidColor;
+    
 
             if (canBePlaced && Input.GetMouseButtonDown(0))
             {
@@ -64,10 +91,22 @@ public class HousePlacementManager : MonoBehaviour
 
                 currentHouseInstance.transform.Rotate(0, 0, 90);
             }
-        }
     }
+     
+}
+private void CancelHouseSelection()
+{
+    // Deselect and destroy the house instance
+    isHouseSelected = false;
+    GameManager.Instance.ChangeState(GameState.HeroesTurn);
+    if (currentHouseInstance != null)
+    {
+        Destroy(currentHouseInstance);
+    }
+}
 
-    private void CreateHouseInstance()
+
+private void CreateHouseInstance()
     {
         if (currentHouseInstance != null)
         {
@@ -86,18 +125,11 @@ public class HousePlacementManager : MonoBehaviour
 
     private bool IsPlacementValid(Vector2Int gridPosition, int originalWidth, int originalHeight)
     {
-        // Check the current rotation of the building
+       
         bool isRotated = Mathf.RoundToInt(currentHouseInstance.transform.eulerAngles.z / 90f) % 2 != 0;
-
-
-
-        // Swap width and height based on rotation
         int width = isRotated ? originalHeight : originalWidth;
         int height = isRotated ? originalWidth : originalHeight;
-
-        // Adjust the starting grid position if necessary
-        // Depending on where your pivot point is, you might need to adjust this logic
-        Vector2Int adjustedGridPosition = gridPosition; // Adjust this based on your pivot and rotation logic
+        Vector2Int adjustedGridPosition = gridPosition; 
 
         int xMultiplier = 1;
         int yMultiplier = 1;
@@ -105,29 +137,22 @@ public class HousePlacementManager : MonoBehaviour
         int currentRotation = (int)currentHouseInstance.transform.eulerAngles.z;
         if(currentRotation == 90 || currentRotation == 180){
             xMultiplier = -1;
-
         }
-
         if(currentRotation == 180 || currentRotation ==270){
              yMultiplier = -1;
         }
-
-        // Check each tile in the area covered by the building
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
+        for (int x = 0; x < width; x++){
+            for (int y = 0; y < height; y++){
                 Vector2Int checkPosition = adjustedGridPosition + new Vector2Int(x*xMultiplier, y*yMultiplier);
                 Tile tile = GridManager.Instance.GetTileAtPosition(checkPosition);
-
-                if (tile == null || !(tile is GrassTile) || tile.OccupiedUnit != null)
+                 if (tile == null || !(tile is GrassTile) || tile.OccupiedUnit != null)
                 {
                     return false; // Invalid position for placement
                 }
             }
-        }
-        return true; // Valid position for placement
+        }return true; // Valid position for placement
     }
+    
 
 
     private Vector2Int SnapPositionToGrid(Vector3 worldPosition) => Vector2Int.FloorToInt((Vector2)worldPosition);

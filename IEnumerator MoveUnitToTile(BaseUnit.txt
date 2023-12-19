@@ -1,0 +1,23 @@
+    IEnumerator MoveUnitToTile(BaseUnit unit, Vector3 targetPosition, BaseEnemy enemy)
+    {
+        float timeToMove = 1.0f;
+        float elapsedTime = 0;
+        Vector3 startPosition = unit.transform.position;
+
+        while (elapsedTime < timeToMove)
+        {
+            unit.transform.position = Vector3.Lerp(startPosition, targetPosition, (elapsedTime / timeToMove));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        unit.transform.position = targetPosition;
+
+        // Destroy enemy if it exists and the unit has reached the target position
+        if (enemy != null)
+        {
+            //Trigger attack animation
+            Destroy(enemy.gameObject);
+        }
+    }
+}
