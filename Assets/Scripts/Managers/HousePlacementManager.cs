@@ -113,7 +113,7 @@ private void CreateHouseInstance()
             Destroy(currentHouseInstance);
         }
         currentHouseInstance = Instantiate(housePrefab);
-        houseRenderer = currentHouseInstance.GetComponentInChildren<SpriteRenderer>();
+        houseRenderer = currentHouseInstance.transform.GetChild(0).GetComponent<SpriteRenderer>();
         originalColor = houseRenderer.color;
         houseRenderer.color = invalidColor;
         // Make sure to set the rotation to default
