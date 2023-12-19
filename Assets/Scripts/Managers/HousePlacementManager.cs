@@ -60,7 +60,7 @@ public class HousePlacementManager : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.R) && currentHouseInstance != null)
             {
-                isRotated = !isRotated; // Toggle rotation state
+                isRotated = false; // Toggle rotation state
 
                 currentHouseInstance.transform.Rotate(0, 0, 90);
             }
@@ -89,6 +89,8 @@ public class HousePlacementManager : MonoBehaviour
         // Check the current rotation of the building
         bool isRotated = Mathf.RoundToInt(currentHouseInstance.transform.eulerAngles.z / 90f) % 2 != 0;
 
+
+
         // Swap width and height based on rotation
         int width = isRotated ? originalHeight : originalWidth;
         int height = isRotated ? originalWidth : originalHeight;
@@ -97,12 +99,25 @@ public class HousePlacementManager : MonoBehaviour
         // Depending on where your pivot point is, you might need to adjust this logic
         Vector2Int adjustedGridPosition = gridPosition; // Adjust this based on your pivot and rotation logic
 
+        int xMultiplier = 1;
+        int yMultiplier = 1;
+
+        int currentRotation = (int)currentHouseInstance.transform.eulerAngles.z;
+        if(currentRotation == 90 || currentRotation == 180){
+            xMultiplier = -1;
+
+        }
+
+        if(currentRotation == 180 || currentRotation ==270){
+             yMultiplier = -1;
+        }
+
         // Check each tile in the area covered by the building
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
-                Vector2Int checkPosition = adjustedGridPosition + new Vector2Int(x, y);
+                Vector2Int checkPosition = adjustedGridPosition + new Vector2Int(x*xMultiplier, y*yMultiplier);
                 Tile tile = GridManager.Instance.GetTileAtPosition(checkPosition);
 
                 if (tile == null || !(tile is GrassTile) || tile.OccupiedUnit != null)
@@ -121,6 +136,8 @@ public class HousePlacementManager : MonoBehaviour
     {
         return new Vector3(gridPos.x, gridPos.y, 0f); // Explicitly create a new Vector3
     }
+
+
 
 
 

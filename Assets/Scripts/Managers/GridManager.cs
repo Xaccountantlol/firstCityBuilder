@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 
 public class GridManager : MonoBehaviour
 {
+    public Camera gridCamera;
     public static GridManager Instance;
     [SerializeField] private int _width, _height;
 
@@ -59,5 +60,19 @@ public class GridManager : MonoBehaviour
     {
         if (_tiles.TryGetValue(pos, out var tile)) return tile;
         return null;
+    }
+    private void OnGUI()
+    {
+        foreach (KeyValuePair<Vector2, Tile> entry in _tiles)
+        {
+            Tile tile = entry.Value;
+            Vector3 point = gridCamera.WorldToScreenPoint(tile.transform.position);
+
+            // Invert the y coordinate to work with GUI's coordinate system
+            point.y = Screen.height - point.y;
+
+            // Draw the label on the screen
+            GUI.Label(new Rect(point.x - 25, point.y - 10, 50, 20), $"{entry.Key.x},{entry.Key.y}");
+        }
     }
 }
